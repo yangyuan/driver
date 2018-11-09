@@ -6,8 +6,8 @@ import tensorflow as tf
 import collections
 
 def get_frames():
-    fps = 3 # targeting 5FPS
-    vidcap = cv2.VideoCapture('data/IMG_0062.MOV')
+    fps = 5 # targeting 5FPS
+    vidcap = cv2.VideoCapture('data/IMG_0182.MOV')
     skip = round(vidcap.get(cv2.CAP_PROP_FPS)/fps)
 
     frames = list()

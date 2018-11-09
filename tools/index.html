@@ -3,17 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <title>XXX</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
 </head>
 <body>
 
 <video id="player" width="640" height="360" controls>
-  <source src="../data/IMG_0062.MOV">
+  <source src="../data/IMG_0182.MOV">
 Your browser does not support the video tag.
 </video>
+<canvas id="myCanvas" width="640" height="320" style="border:1px solid #000000;">
+</canvas>
 
-<button onclick="control.play=true">XXX</button>
+<br />
+<button onclick="control.play=true" type="button" class="btn btn-primary">Start!</button>
 <div id="pending"></div>
 <div id="demo"></div>
+
+
+<div>
+
+<div class="btn-group btn-group-toggle" data-toggle="buttons">
+  <label class="btn btn-dark">
+    <input type="radio" name="options" id="option2" autocomplete="off"> Turn <i class="fas fa-arrow-circle-left"></i>️
+  </label>
+  <label class="btn btn-dark">
+    <input type="radio" name="options" id="option3" autocomplete="off"> Merge <i class="fas fa-angle-double-left"></i>
+  </label>
+  <label class="btn btn-dark">
+    <input type="radio" name="options" id="option3" autocomplete="off"> Fork <i class="fas fa-angle-double-left"></i>
+  </label>
+  <label class="btn btn-dark">
+    <input type="radio" name="options" id="option3" autocomplete="off"> Lane <i class="fas fa-angle-double-left"></i>
+  </label>
+  <label class="btn btn-dark active">
+    <input type="radio" name="options" id="option1" autocomplete="off" checked> <i class="fas fa-arrow-up"></i><i class="fas fa-arrow-up"></i><i class="fas fa-arrow-up"></i>
+  </label>
+  <label class="btn btn-dark">
+    <input type="radio" name="options" id="option4" autocomplete="off"> <i class="fas fa-angle-double-right"></i> Lane
+  </label>
+  <label class="btn btn-dark">
+    <input type="radio" name="options" id="option4" autocomplete="off"> <i class="fas fa-angle-double-right"></i> Fork
+  </label>
+  <label class="btn btn-dark">
+    <input type="radio" name="options" id="option4" autocomplete="off"> <i class="fas fa-angle-double-right"></i> Merge
+  </label>
+  <label class="btn btn-dark">
+    <input type="radio" name="options" id="option5" autocomplete="off"> <i class="fas fa-arrow-circle-right"></i> Turn
+  </label>
+</div>
+<br />
+<br />
+
+    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+  <label class="btn btn-primary active">
+    <input type="radio" name="options" id="option6" autocomplete="off"> Driving
+  </label>
+  <label class="btn btn-warning">
+    <input type="radio" name="options" id="option7" autocomplete="off"> Others
+  </label>
+</div>
+
+
+
+</div>
 <script>
 var vid = document.getElementById("player");
 
@@ -40,8 +97,6 @@ if (control.play) {
 </script>
 
 
-<canvas id="myCanvas" width="640" height="320" style="border:1px solid #000000;">
-</canvas>
 
 <script>
     var c = document.getElementById("myCanvas");
