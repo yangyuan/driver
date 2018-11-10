@@ -1,165 +1,269 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="driverApp">
 <head>
     <meta charset="UTF-8">
     <title>XXX</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+            integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+            integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+            crossorigin="anonymous"></script>
 
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css"
+          integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.4/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.4/angular-resource.min.js"></script>
+
+
+
 </head>
 <body>
-
-<video id="player" width="640" height="360" controls>
-  <source src="../data/IMG_0182.MOV">
-Your browser does not support the video tag.
-</video>
-<canvas id="myCanvas" width="640" height="320" style="border:1px solid #000000;">
-</canvas>
-
-<br />
-<button onclick="control.play=true" type="button" class="btn btn-primary">Start!</button>
-<div id="pending"></div>
-<div id="demo"></div>
+<div class="container" ng-controller="VideosController as driver">
 
 
-<div>
+    <div class="row">
+        <div class="col-sm-2" style="text-align: center;">
+            <div id="videos" class="list-group">
+                <li ng-repeat="video in videos"
+                    class="list-group-item list-group-item-action {{video.name === currentVideo.name ? 'active' : ''}}"
+                    style="cursor: pointer;"
+                    ng-click="onVideoClick(video)">{{video.name}}
+                </li>
+            </div>
+        </div>
+        <div class="col-sm-8" style="text-align: center;">
+            <video id="player" width="640" height="360" style="margin: auto;" controls>
+                Your browser does not support the video tag.
+            </video>
+        </div>
+        <div class="col-sm-2" style="text-align: center;">
+        </div>
+    </div>
 
-<div class="btn-group btn-group-toggle" data-toggle="buttons">
-  <label class="btn btn-dark">
-    <input type="radio" name="options" id="option2" autocomplete="off"> Turn <i class="fas fa-arrow-circle-left"></i>️
-  </label>
-  <label class="btn btn-dark">
-    <input type="radio" name="options" id="option3" autocomplete="off"> Merge <i class="fas fa-angle-double-left"></i>
-  </label>
-  <label class="btn btn-dark">
-    <input type="radio" name="options" id="option3" autocomplete="off"> Fork <i class="fas fa-angle-double-left"></i>
-  </label>
-  <label class="btn btn-dark">
-    <input type="radio" name="options" id="option3" autocomplete="off"> Lane <i class="fas fa-angle-double-left"></i>
-  </label>
-  <label class="btn btn-dark active">
-    <input type="radio" name="options" id="option1" autocomplete="off" checked> <i class="fas fa-arrow-up"></i><i class="fas fa-arrow-up"></i><i class="fas fa-arrow-up"></i>
-  </label>
-  <label class="btn btn-dark">
-    <input type="radio" name="options" id="option4" autocomplete="off"> <i class="fas fa-angle-double-right"></i> Lane
-  </label>
-  <label class="btn btn-dark">
-    <input type="radio" name="options" id="option4" autocomplete="off"> <i class="fas fa-angle-double-right"></i> Fork
-  </label>
-  <label class="btn btn-dark">
-    <input type="radio" name="options" id="option4" autocomplete="off"> <i class="fas fa-angle-double-right"></i> Merge
-  </label>
-  <label class="btn btn-dark">
-    <input type="radio" name="options" id="option5" autocomplete="off"> <i class="fas fa-arrow-circle-right"></i> Turn
-  </label>
-</div>
-<br />
-<br />
+    <div class="row">
+        <div class="col-sm" style="text-align: center; padding: 12px;">
+            <button type="button" class="btn btn-primary" ng-click="onSave()">Save</button>
+            <input ng-model="currentDuration">
+            <button onclick="control.play=true" type="button" class="btn btn-primary"
+                    ng-disabled="currentDuration < 0">Start!
+            </button>
+            <span id="pending"></span>
+            <span id="demo"></span>
+        </div>
+    </div>
 
-    <div class="btn-group btn-group-toggle" data-toggle="buttons">
-  <label class="btn btn-primary active">
-    <input type="radio" name="options" id="option6" autocomplete="off"> Driving
-  </label>
-  <label class="btn btn-warning">
-    <input type="radio" name="options" id="option7" autocomplete="off"> Others
-  </label>
-</div>
+    <div class="row">
+        <div class="col-sm" style="text-align: center;">
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                <label class="btn" ng-class="{'btn-dark':currentStatus !== '8'}">
+                    <input type="radio" name="status" ng-model="currentStatus" value="8"
+                           autocomplete="off">
+                    Turn To <i class="far fa-arrow-alt-circle-left"></i>
+                </label>
+                <label class="btn" ng-class="{'btn-dark':currentStatus !== '6'}">
+                    <input type="radio" name="status" ng-model="currentStatus" value="6"
+                           autocomplete="off">
+                    Merge To <i class="far fa-arrow-alt-circle-left"></i>
+                </label>
+                <label class="btn" ng-class="{'btn-dark':currentStatus !== '4'}">
+                    <input type="radio" name="status" ng-model="currentStatus" value="4"
+                           autocomplete="off">
+                    Fork To <i class="far fa-arrow-alt-circle-left"></i>
+                </label>
+                <label class="btn" ng-class="{'btn-dark':currentStatus !== '2'}">
+                    <input type="radio" name="status" ng-model="currentStatus" value="2"
+                           autocomplete="off">
+                    Lane To <i class="far fa-arrow-alt-circle-left"></i>
+                </label>
+                <label class="btn" ng-class="{'btn-dark':currentStatus !== '1'}">
+                    <input type="radio" name="status" ng-model="currentStatus" value="1"
+                           autocomplete="off">
+                    <i class="far fa-arrow-alt-circle-up"></i>
+                    <i class="far fa-arrow-alt-circle-up"></i>
+                    <i class="far fa-arrow-alt-circle-up"></i>
+                </label>
+                <label class="btn" ng-class="{'btn-dark':currentStatus !== '0'}">
+                    <input type="radio" name="status" ng-model="currentStatus" value="0"
+                           autocomplete="off">
+                    <i class="far fa-question-circle"></i>
+                    <i class="far fa-question-circle"></i>
+                    <i class="far fa-question-circle"></i>
+                </label>
+                <label class="btn" ng-class="{'btn-dark':currentStatus !== '3'}">
+                    <input type="radio" name="status" ng-model="currentStatus" value="3"
+                           autocomplete="off">
+                    <i class="far fa-arrow-alt-circle-right"></i> Lane To
+                </label>
+                <label class="btn" ng-class="{'btn-dark':currentStatus !== '5'}">
+                    <input type="radio" name="status" ng-model="currentStatus" value="5"
+                           autocomplete="off">
+                    <i class="far fa-arrow-alt-circle-right"></i> Fork To
+                </label>
+                <label class="btn" ng-class="{'btn-dark':currentStatus !== '7'}">
+                    <input type="radio" name="status" ng-model="currentStatus" value="7"
+                           autocomplete="off">
+                    <i class="far fa-arrow-alt-circle-right"></i> Merge To
+                </label>
+                <label class="btn" ng-class="{'btn-dark':currentStatus !== '9'}">
+                    <input type="radio" name="status" ng-model="currentStatus" value="9"
+                           autocomplete="off">
+                    <i class="far fa-arrow-alt-circle-right"></i> Turn To
+                </label>
+            </div>
+        </div>
 
 
+    </div>
+    <br/>
+    <br/>
+
+    <canvas id="myCanvas" width="640" height="320" style="border:1px solid #000000;">
+    </canvas>
 
 </div>
 <script>
-var vid = document.getElementById("player");
-
-var control = {play: false, pending: 3, currentTime: 0}
 
 
-setInterval(function(){
-    control.duration = vid.duration;
-    document.getElementById("demo").innerHTML = vid.currentTime;
-}, 100);
+var app = angular.module('driverApp', ['ngResource']);
 
 
-var startp = setInterval(function(){
-if (control.play) {
-    document.getElementById("pending").innerHTML = control.pending;
-    control.pending -= 1
-    }
+app.factory('videosFactory', ['$resource', function($resource) {
+    return $resource('/api/videos/:videoId', {category:'@category', videoId:'@name'}, {
+        'get':    {method:'GET'},
+        'update':   {method:'PUT'},
+        'query':  {method:'GET', isArray:true},
+        'delete': {method:'DELETE'}
+    });
+}]);
 
-    if (control.pending == 0) {
-    clearInterval(startp)
-    }
+ app.controller('VideosController', ['$scope', '$http', '$interval', 'videosFactory', function ($scope, $http, $interval, videosFactory) {
+//app.controller('VideosController', function ($scope, $http) {
+        var ctl = this
+        var vid = document.getElementById("player");
 
-}, 1000);
+        $scope.videos = [];
+        $scope.currentVideo = {};
+        $scope.currentStatus = '0'
+        $scope.currentDuration = -1
+        $scope.currentActionsMap = new Map()
+
+        vid.addEventListener('loadedmetadata', function() {
+            if ($scope.currentDuration < 0) {
+                $scope.currentStatus = '0'
+                $scope.currentDuration = vid.duration
+                $scope.currentActionsMap = initializeActions($scope.currentDuration)
+                $scope.$apply();
+                console.log($scope.currentDuration);
+            }
+        });
+
+
+        $http.get("/api/videos").then(function (response) {
+            $scope.videos = response.data;
+        });
+
+
+        setInterval(function(){
+            if (vid.readyState == 4 && vid.paused == false) {
+                console.log(vid.currentTime)
+                frame_id = Math.round(vid.currentTime*10)
+                console.log(parseInt($scope.currentStatus))
+                $scope.currentActionsMap.set(frame_id, parseInt($scope.currentStatus))
+                console.log($scope.currentActionsMap)
+            }
+        }, 25);
+
+
+        $scope.onSave = function () {
+            $scope.currentVideo.actions = compressActions($scope.currentActionsMap, $scope.currentDuration)
+            console.log($scope.currentVideo)
+
+            videosFactory.update($scope.currentVideo)
+        }
+
+        $scope.onVideoClick = function (video) {
+            $scope.currentVideo = {};
+            $scope.currentStatus = '0'
+            $scope.currentDuration = -1
+            $scope.currentActionsMap = new Map()
+            
+            $scope.currentVideo = video
+            if ($scope.currentVideo.actions != null) {
+                $scope.currentDuration = video.duration;
+                $scope.currentActionsMap = extractActions(video.actions, video.duration);
+
+                if ($scope.currentActionsMap.has(0)) {
+                    $scope.currentStatus = $scope.currentActionsMap.get(0)
+                }
+            }
+
+            vid.src = "/data/" + $scope.currentVideo.name;
+        }
+
+        function extractActions(actionsList, duration) {
+            let actionsMap = new Map()
+            let compressedActionsMap = new Map()
+            let length = Math.ceil(duration * 10)
+            let lastAction = -1
+
+            for (let i=0; i<actionsList.length; i++) {
+                frame_id = Math.floor(actionsList[i][0]*10)
+                frame_action = Math.floor(actionsList[i][1])
+                compressedActionsMap.set(frame_id, frame_action)
+            }
+
+            for (let i=0; i<=length; i++) {
+                let seek = i/10
+                let action = 0
+                if (compressedActionsMap.has(i)) {
+                    lastAction = compressedActionsMap.get(i)
+                }
+                actionsMap.set(i, lastAction);
+            }
+
+            return actionsMap
+        }
+
+        function compressActions(actionsMap, duration) {
+            let actionsList = []
+            let length = Math.ceil(duration * 10)
+            let lastAction = -1
+            for (let i=0; i<=length; i++) {
+                let seek = i/10
+                let action = 0
+                if (actionsMap.has(i)) {
+                    action = actionsMap.get(i)
+                }
+                if (action != lastAction) {
+                    actionsList.push([seek, action])
+                    lastAction = action
+                }
+            }
+            return actionsList;
+        }
+
+        function initializeActions(duration) {
+            let actionsMap = new Map()
+            let length = Math.ceil(duration * 10)
+            for (let i=0; i<=length; i++) {
+                actionsMap.set(i, -1)
+            }
+            return actionsMap;
+        }
+
+    }]);
+
+
+
 </script>
-
-
-
-<script>
-    var c = document.getElementById("myCanvas");
-    var ctx = c.getContext("2d");
-
-
-  var center = {x : 0, y : 0};
-
-  function draw() {
-    ctx.clearRect(0, 0, c.width, c.height);
-    ctx.strokeStyle="#CCCCCC";
-    ctx.moveTo(320, 0);
-    ctx.lineTo(320, 320);
-    ctx.moveTo(0, 160);
-    ctx.lineTo(640, 160);
-    ctx.stroke();
-    ctx.moveTo(160, 0);
-    ctx.lineTo(160, 320);
-    ctx.stroke();
-    ctx.moveTo(480, 0);
-    ctx.lineTo(480, 320);
-    ctx.stroke();
-
-
-
-    ctx.beginPath();
-    ctx.arc(center.x, center.y, 3, 0, 2 * Math.PI);
-    ctx.stroke();
-  }
-
-  function clear() {
-  }
-
-  var  drag = false
-
-  c.addEventListener('mousedown', function(event) {
-    console.log(event.pageX)
-    console.log(c.offsetLeft)
-    center = {
-        x: event.pageX - c.offsetLeft - c.clientLeft,
-        y: event.pageY - c.offsetTop - c.clientTop
-    }
-
-    drag = true;
-      draw()
-  })
-
-  document.addEventListener('mouseup', function(event) {
-    drag = false;
-  })
-
-  c.addEventListener('mousemove', function(event) {
-  console.log(c.clientLeft)
-    if (drag) {
-      center = {
-        x: event.pageX - c.offsetLeft - c.clientLeft,
-        y: event.pageY - c.offsetTop - c.clientTop
-      }
-      draw()
-    }
-  })
-      draw()
-</script>
+<script src="script.js"></script>
 
 </body>
 </html>
