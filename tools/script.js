@@ -1,88 +1,130 @@
+const app = angular.module('driverApp', ['ngResource']);
 
 
+app.factory('videosFactory', ['$resource', function ($resource) {
+    return $resource('/api/videos/:videoId', {category: '@category', videoId: '@name'}, {
+        'get': {method: 'GET'},
+        'update': {method: 'PUT'},
+        'query': {method: 'GET', isArray: true},
+        'delete': {method: 'DELETE'}
+    });
+}]);
 
 
-var vid = document.getElementById("player");
-var control = {play: false, pending: 3, currentTime: 0}
-setInterval(function(){
-    control.duration = vid.duration;
-    document.getElementById("demo").innerHTML = vid.currentTime;
-}, 100);
+app.controller('VideosController', ['$scope', '$http', '$interval', 'videosFactory', function ($scope, $http, $interval, videosFactory) {
+    let vid = document.getElementById("player");
+    $scope.isEditMode = false;
 
-var startp = setInterval(function(){
-if (control.play) {
-    if (control.pending > 0 || control.pending < 3) {
-        document.getElementById("pending").innerHTML = control.pending;
-        control.pending -= 1
+    $scope.videos = [];
+    $scope.currentVideo = {};
+    $scope.currentStatus = '0';
+    $scope.currentDuration = -1;
+    $scope.currentActionsMap = new Map();
+
+    vid.addEventListener('loadedmetadata', function () {
+        if ($scope.currentDuration < 0) {
+            $scope.currentStatus = '0';
+            $scope.currentDuration = vid.duration;
+            $scope.currentActionsMap = initializeActions($scope.currentDuration);
+            $scope.$apply();
+            console.log($scope.currentDuration);
+        }
+    });
+
+
+    $http.get("/api/videos").then(function (response) {
+        $scope.videos = response.data;
+    });
+
+
+    $interval(function () {
+        if (vid.readyState === 4 && vid.paused === false) {
+            let frame_id = Math.round(vid.currentTime * 10);
+            if ($scope.isEditMode) {
+                // console.log(vid.currentTime);
+                // console.log(parseInt($scope.currentStatus));
+                $scope.currentActionsMap.set(frame_id, parseInt($scope.currentStatus));
+            } else {
+                $scope.currentStatus = $scope.currentActionsMap.get(frame_id).toString();
+            }
+        }
+    }, 25);
+
+    $scope.onSave = function () {
+        $scope.currentVideo.actions = compressActions($scope.currentActionsMap, $scope.currentDuration);
+        console.log($scope.currentVideo);
+
+        videosFactory.update($scope.currentVideo);
+    };
+
+    $scope.onVideoClick = function (video) {
+        $scope.currentVideo = {};
+        $scope.currentStatus = '0';
+        $scope.currentDuration = -1;
+        $scope.currentActionsMap = new Map();
+
+        $scope.currentVideo = video;
+        if ($scope.currentVideo.actions != null && video.duration > 0) {
+            $scope.currentDuration = video.duration;
+            $scope.currentActionsMap = extractActions(video.actions, video.duration);
+
+            if ($scope.currentActionsMap.has(0)) {
+                $scope.currentStatus = $scope.currentActionsMap.get(0).toString();
+            }
+        }
+
+        vid.src = "/data/" + $scope.currentVideo.name;
+    };
+
+    function extractActions(actionsList, duration) {
+        let actionsMap = new Map();
+        let compressedActionsMap = new Map();
+        let length = Math.ceil(duration * 10);
+        let lastAction = -1;
+
+        for (let i = 0; i < actionsList.length; i++) {
+            let frame_id = Math.floor(actionsList[i][0] * 10);
+            let frame_action = Math.floor(actionsList[i][1]);
+            compressedActionsMap.set(frame_id, frame_action)
+        }
+
+        for (let i = 0; i <= length; i++) {
+            let seek = i / 10;
+            let action = 0;
+            if (compressedActionsMap.has(i)) {
+                lastAction = compressedActionsMap.get(i);
+            }
+            actionsMap.set(i, lastAction);
+        }
+
+        return actionsMap
     }
-}
 
-if (control.pending == 0) {
-    clearInterval(startp)
-    vid.play()
-}
-
-}, 1000);
-
-
-var c = document.getElementById("myCanvas");
-var ctx = c.getContext("2d");
-
-
-  var center = {x : 0, y : 0};
-
-  function draw() {
-    ctx.clearRect(0, 0, c.width, c.height);
-    ctx.strokeStyle="#CCCCCC";
-    ctx.moveTo(320, 0);
-    ctx.lineTo(320, 320);
-    ctx.moveTo(0, 160);
-    ctx.lineTo(640, 160);
-    ctx.stroke();
-    ctx.moveTo(160, 0);
-    ctx.lineTo(160, 320);
-    ctx.stroke();
-    ctx.moveTo(480, 0);
-    ctx.lineTo(480, 320);
-    ctx.stroke();
-
-
-
-    ctx.beginPath();
-    ctx.arc(center.x, center.y, 3, 0, 2 * Math.PI);
-    ctx.stroke();
-  }
-
-  function clear() {
-  }
-
-  var  drag = false
-
-  c.addEventListener('mousedown', function(event) {
-    console.log(event.pageX)
-    console.log(c.offsetLeft)
-    center = {
-        x: event.pageX - c.offsetLeft - c.clientLeft,
-        y: event.pageY - c.offsetTop - c.clientTop
+    function compressActions(actionsMap, duration) {
+        let actionsList = [];
+        let length = Math.ceil(duration * 10);
+        let lastAction = -1;
+        for (let i = 0; i <= length; i++) {
+            let seek = i / 10;
+            let action = 0;
+            if (actionsMap.has(i)) {
+                action = actionsMap.get(i)
+            }
+            if (action !== lastAction) {
+                actionsList.push([seek, action]);
+                lastAction = action
+            }
+        }
+        return actionsList;
     }
 
-    drag = true;
-      draw()
-  })
-
-  document.addEventListener('mouseup', function(event) {
-    drag = false;
-  })
-
-  c.addEventListener('mousemove', function(event) {
-  console.log(c.clientLeft)
-    if (drag) {
-      center = {
-        x: event.pageX - c.offsetLeft - c.clientLeft,
-        y: event.pageY - c.offsetTop - c.clientTop
-      }
-      draw()
+    function initializeActions(duration) {
+        let actionsMap = new Map();
+        let length = Math.ceil(duration * 10);
+        for (let i = 0; i <= length; i++) {
+            actionsMap.set(i, -1)
+        }
+        return actionsMap;
     }
-  })
-      draw()
 
+}]);
