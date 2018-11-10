@@ -43,17 +43,23 @@
                     Your browser does not support the video tag.
                 </video>
             </div>
+
+            <div class="progress">
+                <div ng-repeat="action in currentActionsCache" class="progress-bar"
+                     ng-style="{ 'width': action[1] * 100 + '%', 'background-color': colors[action[0]]}">{{action[0]}}</div>
+            </div>
         </div>
         <div class="col-sm-3" style="text-align: center;">
             <div class="row">
                 <div class="col-sm">
-                    <button type="button" class="btn btn-primary" ng-click="onSave()" ng-disabled="currentDuration < 0">
+                    <button type="button" class="btn btn-primary" ng-click="onSave()"
+                            ng-disabled="currentVideo.duration <= 0">
                         Save
                     </button>
-                    <input ng-model="currentDuration">
+                    <input ng-model="currentVideo.duration">
 
                     <div class="btn-group-toggle" data-toggle="buttons">
-                        <label class="btn btn-primary">
+                        <label class="btn btn-primary" id="checkboxEditMode">
                             <input type="checkbox" autocomplete="off" ng-model="isEditMode"> {{isEditMode? "🗹":"☐"}}
                             Edit Mode
                         </label>
@@ -89,6 +95,7 @@
                 </label>
                 <label class="btn" ng-class="{'btn-dark':currentStatus !== '1'}">
                     <input type="radio" name="status" ng-model="currentStatus" value="1"
+                           ng-change="onActionSelect()"
                            autocomplete="off">
                     <i class="far fa-arrow-alt-circle-up"></i>
                     <i class="far fa-arrow-alt-circle-up"></i>
