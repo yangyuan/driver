@@ -61,7 +61,7 @@ class DataSet:
             raw_frame_index += 1
             if raw_frame_index % skip == 0:
 
-                image = cv2.resize(image, (self.width, self.height))
+                image = cv2.resize(image, (self.height, self.width))
                 image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
                 timestamp = raw_frame_index / raw_fps
                 action = video_actions.get_action(timestamp)
@@ -79,13 +79,16 @@ class DataSet:
 
         return frames, actions
 
-    def _to_sequence_trunks(self, frames, actions):
+    def _to_sequence_trunks(self, frames, actions, keep_dim=False):
         temp_x = deque()
         x = []
         y = []
 
         for frame, action in zip(frames, actions):
-            frame = np.array(frame, np.float).ravel()
+            if keep_dim:
+                frame = np.array(frame, np.float).reshape(self.height, self.width, 1)
+            else:
+                frame = np.array(frame, np.float).ravel()
             # Add to the queue.
             if len(temp_x) == self.trunk_size - 1:
                 temp_x.append(frame)
