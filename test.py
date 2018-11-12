@@ -20,7 +20,7 @@ if __name__ == '__main__':
     # data.dump_cache()
     data.load_cache()
     # data.to_sequence_trunks()
-    _net = get_network_wide(15, data.frame_size, data.class_number)
+    _net = get_network_wide(50, data.frame_size, data.class_number)
     model = tflearn.DNN(_net, tensorboard_verbose=0)
 
     model.save('data/checkpoints/lstm.128.160.90.tflearn')

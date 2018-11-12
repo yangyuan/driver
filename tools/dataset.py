@@ -11,7 +11,7 @@ from tools._data import get_data_path
 
 
 class DataSet:
-    def __init__(self, fps=5, width=320, height=180, trunk_size=15, class_number=10, verbose=False):
+    def __init__(self, fps=5, width=320, height=180, trunk_size=50, class_number=10, verbose=False):
         self.fps = fps
         self.trunk_size = trunk_size
         self.width = width
