@@ -1,12 +1,11 @@
-import os
 import json
 from flask import Flask, send_from_directory, jsonify, request
 
-from data import Data
+from tools import VideoSet
 
 
-app = Flask(__name__, static_folder='')
-data = Data(os.path.join(app.root_path, 'data.json'))
+app = Flask(__name__, static_folder='www')
+video_set = VideoSet()
 
 
 @app.route('/<path:path>')
@@ -16,7 +15,7 @@ def send_js(path):
 
 @app.route('/data/<path:path>')
 def send_video(path):
-    return send_from_directory(os.path.join(app.root_path, '..', 'data'), path)
+    return send_from_directory('data', path)
 
 
 @app.after_request
@@ -31,13 +30,13 @@ def add_header(r):
 @app.route('/api/videos/<string:videoId>', methods=['PUT'])
 def update(videoId):
     video = json.loads(request.data.decode())
-    data.update_video(video)
+    video_set.update_video(video)
     return jsonify(video)
 
 
 @app.route("/api/videos")
 def hello():
-    return jsonify(data.get_videos())
+    return jsonify(video_set.get_videos())
 
 
 if __name__ == '__main__':

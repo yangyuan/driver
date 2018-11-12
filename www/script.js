@@ -15,16 +15,16 @@ app.controller('VideosController', ['$scope', '$http', '$interval', 'videosFacto
     let vid = document.getElementById("player");
 
     $scope.colors = [
-        '#CCCCCC',
-        '#007BFF',
-        '#FF4000',
-        '#28a745',
-        '#FFFF00',
-        '#00FFFF',
+        '#999999',
+        '#32CD32',
         '#800080',
         '#008080',
-        '#FF00FF',
-        '#FFA500',
+        '#FF0099',
+        '#7FFFD4',
+        '#FF6600',
+        '#339999',
+        '#FF3300',
+        '#0077FF',
     ];
 
     $scope.isEditMode = false;
@@ -35,6 +35,11 @@ app.controller('VideosController', ['$scope', '$http', '$interval', 'videosFacto
     $scope.currentActionsMap = new Map();
     $scope.currentActionsCache = [];
 
+    $scope.refreshVideos = function() {
+        let videos = videosFactory.query();
+    };
+
+    $scope.videos = videosFactory.query();
 
     vid.addEventListener('loadedmetadata', function () {
         if ($scope.currentVideo.duration < 0) {
@@ -45,12 +50,6 @@ app.controller('VideosController', ['$scope', '$http', '$interval', 'videosFacto
             console.log($scope.currentVideo.duration);
         }
     });
-
-
-    $http.get("/api/videos").then(function (response) {
-        $scope.videos = response.data;
-    });
-
 
     $interval(function () {
         if (vid.readyState === 4 && vid.paused === false) {
@@ -71,14 +70,18 @@ app.controller('VideosController', ['$scope', '$http', '$interval', 'videosFacto
 
     $scope.onSave = function () {
         $scope.currentVideo.actions = compressActions($scope.currentActionsMap, $scope.currentVideo.duration);
+        $scope.currentVideo.status = 1;
         console.log($scope.currentVideo);
 
         videosFactory.update($scope.currentVideo);
     };
 
-    $scope.onActionSelect = function () {
+    $scope.onActionSelect = function ($event) {
         $scope.isEditMode = true;
-        $('#checkboxEditMode').addClass('active')
+        $('#checkboxEditMode').addClass('active');
+
+        $event.currentTarget.addClass('active').siblings().removeClass('active');
+        $event.currentTarget.addClass('focus').siblings().removeClass('focus');
     };
 
     $scope.onVideoClick = function (video) {

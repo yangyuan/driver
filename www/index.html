@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="driverApp">
+<head>
+    <meta charset="UTF-8">
+    <title>Driver</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.4/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.4/angular-resource.min.js"></script>
+
+
+</head>
+<body>
+<div class="container" style="min-width: 1110px; margin: 32px auto;" ng-controller="VideosController as driver">
+
+
+    <div class="row">
+        <div class="col-sm-3" style="text-align: center;">
+            <div id="videos" class="list-group">
+                <li ng-repeat="video in videos"
+                    class="list-group-item list-group-item-action {{video.name === currentVideo.name ? 'active' : ''}}"
+                    style="cursor: pointer; padding: .5rem;font-size: smaller; "
+                    ng-click="onVideoClick(video)">{{video.name}}
+                    <span class="badge badge-success badge-pill" style="position: absolute; right: 8px; line-height: 1.5; " ng-if="video.status === 0">new</span>
+                    <span class="badge badge-warning badge-pill" style="position: absolute; right: 8px; line-height: 1.5; " ng-if="video.status === -1">unsaved</span>
+                </li>
+            </div>
+        </div>
+        <div class="col-sm-6" style="text-align: center;">
+            <div class="row">
+                <video id="player" width="555" height="312" style="margin: auto;" controls>
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+
+            <div class="row">
+                <div class="progress" style="width: 512px; margin: 15px auto;">
+                    <div ng-repeat="action in currentActionsCache" class="progress-bar"
+                         ng-style="{ 'width': action[1] * 100 + '%', 'background-color': colors[action[0]]}">
+                        {{action[0]}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="row">
+                <div class="col-sm">
+                    <div class="input-group input-group-sm mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Duration</span>
+                        </div>
+                        <input type="text" class="form-control" aria-label="Small" ng-model="currentVideo.duration"
+                               style="background-color: #ffffff;"
+                               readonly
+                               aria-describedby="inputGroup-sizing-sm">
+                    </div>
+                    <div class="input-group input-group-sm mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Status</span>
+                        </div>
+                        <input type="text" class="form-control" aria-label="Small" ng-model="currentVideo.status"
+                               style="background-color: #ffffff;"
+                               readonly
+                               aria-describedby="inputGroup-sizing-sm">
+                    </div>
+                    <div class="input-group input-group-sm mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Actions</span>
+                        </div>
+                        <input type="text" class="form-control" aria-label="Small" ng-model="currentVideo.actions.length"
+                               style="background-color: #ffffff;"
+                               readonly
+                               aria-describedby="inputGroup-sizing-sm">
+                    </div>
+
+                    <div class="form-group">
+                        <button type="button" class="btn btn-primary" ng-click="onSave()"
+                                ng-disabled="currentVideo.duration <= 0"> Save
+                        </button>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="btn-group-toggle" data-toggle="buttons">
+                            <label class="btn btn-outline-success" id="checkboxEditMode">
+                                <input type="checkbox" autocomplete="off" ng-model="isEditMode"> {{isEditMode?
+                                "🗹":"☐"}}
+                                Edit Mode
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-sm" style="text-align: center; padding: 16px;">
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                <label class="btn btn-outline-dark" ng-class="{'active':currentStatus === '8'}"
+                       ng-click="onActionSelect($event)">
+                    <input type="radio" name="status" ng-model="currentStatus" value="8"
+                           autocomplete="off">
+                    Turn To <i class="far fa-arrow-alt-circle-left"></i>
+                </label>
+                <label class="btn btn-outline-dark" ng-class="{'btn-dark':currentStatus === '6'}"
+                       ng-click="onActionSelect($event)">
+                    <input type="radio" name="status" ng-model="currentStatus" value="6"
+                           autocomplete="off">
+                    Merge To <i class="far fa-arrow-alt-circle-left"></i>
+                </label>
+                <label class="btn btn-outline-dark" ng-class="{'active':currentStatus === '4'}"
+                       ng-click="onActionSelect($event)">
+                    <input type="radio" name="status" ng-model="currentStatus" value="4"
+                           autocomplete="off">
+                    Fork To <i class="far fa-arrow-alt-circle-left"></i>
+                </label>
+                <label class="btn btn-outline-dark" ng-class="{'active':currentStatus === '2'}"
+                       ng-click="onActionSelect($event)">
+                    <input type="radio" name="status" ng-model="currentStatus" value="2"
+                           autocomplete="off">
+                    Lane To <i class="far fa-arrow-alt-circle-left"></i>
+                </label>
+                <label class="btn btn-outline-dark" ng-class="{'active':currentStatus === '1'}"
+                       ng-click="onActionSelect($event)">
+                    <input type="radio" name="status" ng-model="currentStatus" value="1"
+                           autocomplete="off">
+                    <i class="far fa-arrow-alt-circle-up"></i>
+                    <i class="far fa-arrow-alt-circle-up"></i>
+                    <i class="far fa-arrow-alt-circle-up"></i>
+                </label>
+                <label class="btn btn-outline-dark" ng-class="{'active':currentStatus === '0'}"
+                       ng-click="onActionSelect($event)">
+                    <input type="radio" name="status" ng-model="currentStatus" value="0"
+                           autocomplete="off">
+                    <i class="far fa-question-circle"></i>
+                    <i class="far fa-question-circle"></i>
+                    <i class="far fa-question-circle"></i>
+                </label>
+                <label class="btn btn-outline-dark" ng-class="{'active':currentStatus === '3'}"
+                       ng-click="onActionSelect($event)">
+                    <input type="radio" name="status" ng-model="currentStatus" value="3"
+                           autocomplete="off">
+                    <i class="far fa-arrow-alt-circle-right"></i> Lane To
+                </label>
+                <label class="btn btn-outline-dark" ng-class="{'active':currentStatus === '5'}"
+                       ng-click="onActionSelect($event)">
+                    <input type="radio" name="status" ng-model="currentStatus" value="5"
+                           autocomplete="off">
+                    <i class="far fa-arrow-alt-circle-right"></i> Fork To
+                </label>
+                <label class="btn btn-outline-dark" ng-class="{'active':currentStatus === '7'}"
+                       ng-click="onActionSelect($event)">
+                    <input type="radio" name="status" ng-model="currentStatus" value="7"
+                           autocomplete="off">
+                    <i class="far fa-arrow-alt-circle-right"></i> Merge To
+                </label>
+                <label class="btn btn-outline-dark" ng-class="{'active':currentStatus === '9'}"
+                       ng-click="onActionSelect($event)">
+                    <input type="radio" name="status" ng-model="currentStatus" value="9"
+                           autocomplete="off">
+                    <i class="far fa-arrow-alt-circle-right"></i> Turn To
+                </label>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+<script src="script.js"></script>
+
+</body>
+</html>
