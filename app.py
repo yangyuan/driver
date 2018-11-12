@@ -27,8 +27,9 @@ def add_header(r):
     return r
 
 
-@app.route('/api/videos/<string:videoId>', methods=['PUT'])
+@app.route('/api/videos/<path:videoId>', methods=['PUT'])
 def update(videoId):
+    print(videoId)
     video = json.loads(request.data.decode())
     video_set.update_video(video)
     return jsonify(video)

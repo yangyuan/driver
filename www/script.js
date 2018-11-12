@@ -28,14 +28,18 @@ app.controller('VideosController', ['$scope', '$http', '$interval', 'videosFacto
     ];
 
     $scope.isEditMode = false;
+    $scope.isEditDepatureMode = false;
 
     $scope.videos = [];
     $scope.currentVideo = {duration: -1};
     $scope.currentStatus = '0';
+    $scope.currentDepature = '0';
     $scope.currentActionsMap = new Map();
+    $scope.currentDepatureMap = new Map();
     $scope.currentActionsCache = [];
+    $scope.currentDepatureCache = [];
 
-    $scope.refreshVideos = function() {
+    $scope.refreshVideos = function () {
         let videos = videosFactory.query();
     };
 
@@ -46,6 +50,7 @@ app.controller('VideosController', ['$scope', '$http', '$interval', 'videosFacto
             $scope.currentStatus = '0';
             $scope.currentVideo.duration = Math.round(vid.duration * 10) / 10;
             $scope.currentActionsMap = initializeActions(vid.duration);
+            $scope.currentDepatureMap = initializeDepartures(vid.duration);
             $scope.$apply();
             console.log($scope.currentVideo.duration);
         }
@@ -65,11 +70,24 @@ app.controller('VideosController', ['$scope', '$http', '$interval', 'videosFacto
             } else {
                 $scope.currentStatus = $scope.currentActionsMap.get(frame_id).toString();
             }
+
+            if ($scope.isEditDepatureMode) {
+                let value_old = $scope.currentDepatureMap.get(frame_id)
+                let value_new = parseInt($scope.currentDepature)
+
+                if (value_old !== value_new) {
+                    $scope.currentDepatureMap.set(frame_id, value_new);
+                    $scope.currentDepatureCache = compressToCache($scope.currentDepatureMap, $scope.currentVideo.duration);
+                }
+            } else {
+                $scope.currentDepature = $scope.currentDepatureMap.get(frame_id).toString();
+            }
         }
     }, 25);
 
     $scope.onSave = function () {
         $scope.currentVideo.actions = compressActions($scope.currentActionsMap, $scope.currentVideo.duration);
+        $scope.currentVideo.warnings = compressActions($scope.currentDepatureMap, $scope.currentVideo.duration);
         $scope.currentVideo.status = 1;
         console.log($scope.currentVideo);
 
@@ -87,6 +105,8 @@ app.controller('VideosController', ['$scope', '$http', '$interval', 'videosFacto
     $scope.onVideoClick = function (video) {
         $scope.currentStatus = '0';
         $scope.currentActionsMap = new Map();
+        $scope.currentDepature = '0';
+        $scope.currentDepatureMap = new Map();
 
         if (video.duration === undefined) {
             video.duration = -1
@@ -102,6 +122,19 @@ app.controller('VideosController', ['$scope', '$http', '$interval', 'videosFacto
             if ($scope.currentActionsMap.has(0)) {
                 $scope.currentStatus = $scope.currentActionsMap.get(0).toString();
             }
+        } else {
+            $scope.currentActionsCache = [];
+        }
+
+        if ($scope.currentVideo.warnings != null && video.duration > 0) {
+            $scope.currentDepatureMap = extractActions(video.warnings, video.duration);
+            $scope.currentDepatureCache = compressToCache($scope.currentDepatureMap, $scope.currentVideo.duration);
+
+            if ($scope.currentDepatureMap.has(0)) {
+                $scope.currentDepature = $scope.currentDepatureMap.get(0).toString();
+            }
+        } else {
+            $scope.currentDepatureCache = [];
         }
 
         vid.src = "/data/" + $scope.currentVideo.name;
@@ -175,6 +208,15 @@ app.controller('VideosController', ['$scope', '$http', '$interval', 'videosFacto
     }
 
     function initializeActions(duration) {
+        let actionsMap = new Map();
+        let length = Math.ceil(duration * 10);
+        for (let i = 0; i <= length; i++) {
+            actionsMap.set(i, 0)
+        }
+        return actionsMap;
+    }
+
+    function initializeDepartures(duration) {
         let actionsMap = new Map();
         let length = Math.ceil(duration * 10);
         for (let i = 0; i <= length; i++) {

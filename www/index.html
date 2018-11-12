@@ -23,7 +23,7 @@
 
     <div class="row">
         <div class="col-sm-3" style="text-align: center;">
-            <div id="videos" class="list-group">
+            <div id="videos" class="list-group" style="max-height: 320px; overflow: scroll">
                 <li ng-repeat="video in videos"
                     class="list-group-item list-group-item-action {{video.name === currentVideo.name ? 'active' : ''}}"
                     style="cursor: pointer; padding: .5rem;font-size: smaller; "
@@ -41,6 +41,12 @@
             </div>
 
             <div class="row">
+                <div class="progress" style="width: 512px; margin: 15px auto;">
+                    <div ng-repeat="warning in currentDepatureCache" class="progress-bar"
+                         ng-style="{ 'width': warning[1] * 100 + '%', 'background-color': colors[warning[0]]}">
+                        {{warning[0]}}
+                    </div>
+                </div>
                 <div class="progress" style="width: 512px; margin: 15px auto;">
                     <div ng-repeat="action in currentActionsCache" class="progress-bar"
                          ng-style="{ 'width': action[1] * 100 + '%', 'background-color': colors[action[0]]}">
@@ -91,7 +97,14 @@
                             <label class="btn btn-outline-success" id="checkboxEditMode">
                                 <input type="checkbox" autocomplete="off" ng-model="isEditMode"> {{isEditMode?
                                 "🗹":"☐"}}
-                                Edit Mode
+                                Action Edit Mode
+                            </label>
+                        </div>
+                        <div class="btn-group-toggle" data-toggle="buttons">
+                            <label class="btn btn-outline-success" id="checkboxEditDepatureMode">
+                                <input type="checkbox" autocomplete="off" ng-model="isEditDepatureMode"> {{isEditDepatureMode?
+                                "🗹":"☐"}}
+                                Depature Edit Mode
                             </label>
                         </div>
                     </div>
@@ -100,6 +113,32 @@
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-sm" style="text-align: center; padding: 16px;">
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                <label class="btn btn-outline-dark" ng-class="{'active':currentDepature === '1'}">
+                    <input type="radio" name="departure" ng-model="currentDepature" value="1"
+                           autocomplete="off">
+                    <i class="fas fa-angle-left"></i>
+                    <i class="fas fa-angle-left"></i>
+                </label>
+                <label class="btn btn-outline-dark" ng-class="{'active':currentDepature === '0'}">
+                    <input type="radio" name="departure" ng-model="currentDepature" value="0"
+                           autocomplete="off">
+                    <i class="fas fa-angle-double-up"></i>
+                    <i class="fas fa-angle-double-up"></i>
+                </label>
+                <label class="btn btn-outline-dark" ng-class="{'active':currentDepature === '2'}">
+                    <input type="radio" name="departure" ng-model="currentDepature" value="2"
+                           autocomplete="off">
+                    <i class="fas fa-angle-right"></i>
+                    <i class="fas fa-angle-right"></i>
+                </label>
+            </div>
+        </div>
+
+
+    </div>
 
     <div class="row">
         <div class="col-sm" style="text-align: center; padding: 16px;">
