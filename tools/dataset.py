@@ -93,7 +93,7 @@ class DataSet:
             if len(temp_x) == self.trunk_size - 1:
                 temp_x.append(frame)
                 x.append(np.array(list(temp_x)))
-                temp_y = action
+                temp_y = [action]
                 y.append(temp_y)
                 temp_x.popleft()
             else:
@@ -109,5 +109,5 @@ class DataSet:
         for frames, actions in self.data:
             for frame, action in zip(frames, actions):
                 frame = np.array(frame, np.float).reshape(320, 180, 1)
-                label = action
+                label = [action]
                 yield np.array([frame]), np.array([label])

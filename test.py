@@ -3,7 +3,7 @@ import tflearn
 import numpy as np
 
 
-def get_network_wide(frames, height, width, num_classes):
+def get_network_wide(frames, height, width):
     """Create a one-layer LSTM"""
     net = tflearn.input_data(shape=[None, frames, height, width, 1])
     net = tflearn.reshape(net, [-1, height, width, 1])
@@ -16,17 +16,17 @@ def get_network_wide(frames, height, width, num_classes):
     # 128
     net = tflearn.lstm(net, 128, dropout=0.2)
     # 10
-    net = tflearn.fully_connected(net, num_classes, activation='relu')
+    net = tflearn.fully_connected(net, 1, activation='relu')
     net = tflearn.regression(net, optimizer='adam', learning_rate=0.0005,
-                             loss='mean_squared_error', name='output1')
+                             loss='mean_square', name='output1')
     return net
 
 
 if __name__ == '__main__':
 
     data = DataSet(width=160, height=90)
-    data.load()
-    data.dump_cache()
+    # data.load()
+    # data.dump_cache()
     data.load_cache()
     # data.to_sequence_trunks()
     _net = get_network_wide(50, data.height, data.width)
