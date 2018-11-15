@@ -32,7 +32,7 @@ class DataSet:
 
             _video_path = os.path.join(_data_path, video['name'])
             print('extract: ', video['name'])
-            frames, actions = self._extract_frames(_video_path, VideoActionSequence(video['actions']))
+            frames, actions = self._extract_frames(_video_path, VideoActionSequence(video['speeds']))
             self.data.append((frames, actions))
 
     def dump_cache(self):
@@ -93,8 +93,7 @@ class DataSet:
             if len(temp_x) == self.trunk_size - 1:
                 temp_x.append(frame)
                 x.append(np.array(list(temp_x)))
-                temp_y = [0] * self.class_number
-                temp_y[action] = 1
+                temp_y = action
                 y.append(temp_y)
                 temp_x.popleft()
             else:
@@ -110,6 +109,5 @@ class DataSet:
         for frames, actions in self.data:
             for frame, action in zip(frames, actions):
                 frame = np.array(frame, np.float).reshape(320, 180, 1)
-                label = [0] * self.class_number
-                label[action] = 1
+                label = action
                 yield np.array([frame]), np.array([label])

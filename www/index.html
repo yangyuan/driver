@@ -28,8 +28,12 @@
                     class="list-group-item list-group-item-action {{video.name === currentVideo.name ? 'active' : ''}}"
                     style="cursor: pointer; padding: .5rem;font-size: smaller; "
                     ng-click="onVideoClick(video)">{{video.name}}
-                    <span class="badge badge-success badge-pill" style="position: absolute; right: 8px; line-height: 1.5; " ng-if="video.status === 0">new</span>
-                    <span class="badge badge-warning badge-pill" style="position: absolute; right: 8px; line-height: 1.5; " ng-if="video.status === -1">unsaved</span>
+                    <span class="badge badge-success badge-pill"
+                          style="position: absolute; right: 8px; line-height: 1.5; "
+                          ng-if="video.status === 0">new</span>
+                    <span class="badge badge-warning badge-pill"
+                          style="position: absolute; right: 8px; line-height: 1.5; "
+                          ng-if="video.status === -1">unsaved</span>
                 </li>
             </div>
         </div>
@@ -42,15 +46,9 @@
 
             <div class="row">
                 <div class="progress" style="width: 512px; margin: 15px auto;">
-                    <div ng-repeat="warning in currentDepatureCache" class="progress-bar"
-                         ng-style="{ 'width': warning[1] * 100 + '%', 'background-color': colors[warning[0]]}">
-                        {{warning[0]}}
-                    </div>
-                </div>
-                <div class="progress" style="width: 512px; margin: 15px auto;">
-                    <div ng-repeat="action in currentActionsCache" class="progress-bar"
-                         ng-style="{ 'width': action[1] * 100 + '%', 'background-color': colors[action[0]]}">
-                        {{action[0]}}
+                    <div ng-repeat="status in currentStatusDenseList" class="progress-bar"
+                         ng-style="{ 'width': status[1] * 100 + '%', 'background-color': getColor(status[0]/70)}">
+                {{status[0]}}
                     </div>
                 </div>
             </div>
@@ -80,7 +78,8 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text">Actions</span>
                         </div>
-                        <input type="text" class="form-control" aria-label="Small" ng-model="currentVideo.actions.length"
+                        <input type="text" class="form-control" aria-label="Small"
+                               ng-model="currentVideo.actions.length"
                                style="background-color: #ffffff;"
                                readonly
                                aria-describedby="inputGroup-sizing-sm">
@@ -96,15 +95,7 @@
                         <div class="btn-group-toggle" data-toggle="buttons">
                             <label class="btn btn-outline-success" id="checkboxEditMode">
                                 <input type="checkbox" autocomplete="off" ng-model="isEditMode"> {{isEditMode?
-                                "🗹":"☐"}}
-                                Action Edit Mode
-                            </label>
-                        </div>
-                        <div class="btn-group-toggle" data-toggle="buttons">
-                            <label class="btn btn-outline-success" id="checkboxEditDepatureMode">
-                                <input type="checkbox" autocomplete="off" ng-model="isEditDepatureMode"> {{isEditDepatureMode?
-                                "🗹":"☐"}}
-                                Depature Edit Mode
+                                "🗹":"☐"}} Edit Mode
                             </label>
                         </div>
                     </div>
@@ -114,104 +105,16 @@
     </div>
 
     <div class="row">
-        <div class="col-sm" style="text-align: center; padding: 16px;">
-            <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                <label class="btn btn-outline-dark" ng-class="{'active':currentDepature === '1'}">
-                    <input type="radio" name="departure" ng-model="currentDepature" value="1"
-                           autocomplete="off">
-                    <i class="fas fa-angle-left"></i>
-                    <i class="fas fa-angle-left"></i>
-                </label>
-                <label class="btn btn-outline-dark" ng-class="{'active':currentDepature === '0'}">
-                    <input type="radio" name="departure" ng-model="currentDepature" value="0"
-                           autocomplete="off">
-                    <i class="fas fa-angle-double-up"></i>
-                    <i class="fas fa-angle-double-up"></i>
-                </label>
-                <label class="btn btn-outline-dark" ng-class="{'active':currentDepature === '2'}">
-                    <input type="radio" name="departure" ng-model="currentDepature" value="2"
-                           autocomplete="off">
-                    <i class="fas fa-angle-right"></i>
-                    <i class="fas fa-angle-right"></i>
-                </label>
+        <div class="col-sm-6 offset-sm-3 align-self-center">
+            <div class="form-group" style="text-align: center;">
+                <label for="formControlRange">Example Range input: {{currentStatus}}</label>
+                <input type="range" class="form-control-range" id="formControlRange" min="0" max="70" step="5" ng-model="currentStatus">
             </div>
-        </div>
 
+        </div>
 
     </div>
 
-    <div class="row">
-        <div class="col-sm" style="text-align: center; padding: 16px;">
-            <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                <label class="btn btn-outline-dark" ng-class="{'active':currentStatus === '8'}"
-                       ng-click="onActionSelect($event)">
-                    <input type="radio" name="status" ng-model="currentStatus" value="8"
-                           autocomplete="off">
-                    Turn To <i class="far fa-arrow-alt-circle-left"></i>
-                </label>
-                <label class="btn btn-outline-dark" ng-class="{'btn-dark':currentStatus === '6'}"
-                       ng-click="onActionSelect($event)">
-                    <input type="radio" name="status" ng-model="currentStatus" value="6"
-                           autocomplete="off">
-                    Merge To <i class="far fa-arrow-alt-circle-left"></i>
-                </label>
-                <label class="btn btn-outline-dark" ng-class="{'active':currentStatus === '4'}"
-                       ng-click="onActionSelect($event)">
-                    <input type="radio" name="status" ng-model="currentStatus" value="4"
-                           autocomplete="off">
-                    Fork To <i class="far fa-arrow-alt-circle-left"></i>
-                </label>
-                <label class="btn btn-outline-dark" ng-class="{'active':currentStatus === '2'}"
-                       ng-click="onActionSelect($event)">
-                    <input type="radio" name="status" ng-model="currentStatus" value="2"
-                           autocomplete="off">
-                    Lane To <i class="far fa-arrow-alt-circle-left"></i>
-                </label>
-                <label class="btn btn-outline-dark" ng-class="{'active':currentStatus === '1'}"
-                       ng-click="onActionSelect($event)">
-                    <input type="radio" name="status" ng-model="currentStatus" value="1"
-                           autocomplete="off">
-                    <i class="far fa-arrow-alt-circle-up"></i>
-                    <i class="far fa-arrow-alt-circle-up"></i>
-                    <i class="far fa-arrow-alt-circle-up"></i>
-                </label>
-                <label class="btn btn-outline-dark" ng-class="{'active':currentStatus === '0'}"
-                       ng-click="onActionSelect($event)">
-                    <input type="radio" name="status" ng-model="currentStatus" value="0"
-                           autocomplete="off">
-                    <i class="far fa-question-circle"></i>
-                    <i class="far fa-question-circle"></i>
-                    <i class="far fa-question-circle"></i>
-                </label>
-                <label class="btn btn-outline-dark" ng-class="{'active':currentStatus === '3'}"
-                       ng-click="onActionSelect($event)">
-                    <input type="radio" name="status" ng-model="currentStatus" value="3"
-                           autocomplete="off">
-                    <i class="far fa-arrow-alt-circle-right"></i> Lane To
-                </label>
-                <label class="btn btn-outline-dark" ng-class="{'active':currentStatus === '5'}"
-                       ng-click="onActionSelect($event)">
-                    <input type="radio" name="status" ng-model="currentStatus" value="5"
-                           autocomplete="off">
-                    <i class="far fa-arrow-alt-circle-right"></i> Fork To
-                </label>
-                <label class="btn btn-outline-dark" ng-class="{'active':currentStatus === '7'}"
-                       ng-click="onActionSelect($event)">
-                    <input type="radio" name="status" ng-model="currentStatus" value="7"
-                           autocomplete="off">
-                    <i class="far fa-arrow-alt-circle-right"></i> Merge To
-                </label>
-                <label class="btn btn-outline-dark" ng-class="{'active':currentStatus === '9'}"
-                       ng-click="onActionSelect($event)">
-                    <input type="radio" name="status" ng-model="currentStatus" value="9"
-                           autocomplete="off">
-                    <i class="far fa-arrow-alt-circle-right"></i> Turn To
-                </label>
-            </div>
-        </div>
-
-
-    </div>
 </div>
 <script src="script.js"></script>
 

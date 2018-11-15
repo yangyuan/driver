@@ -8,28 +8,28 @@ def get_network_wide(frames, height, width, num_classes):
     net = tflearn.input_data(shape=[None, frames, height, width, 1])
     net = tflearn.reshape(net, [-1, height, width, 1])
     # (?, 18, 32, 8)
-    net = tflearn.conv_2d(net, 8, [20, 20], 5)
+    net = tflearn.conv_2d(net, 8, [20, 20], 5, activation='relu')
     # (?, 6, 8, 16)
-    net = tflearn.conv_2d(net, 16, [6, 8], [3, 4])
+    net = tflearn.conv_2d(net, 16, [6, 8], [3, 4], activation='relu')
     # 768
     net = tflearn.reshape(net, [-1, frames, 8*6*16])
     # 128
     net = tflearn.lstm(net, 128, dropout=0.2)
     # 10
-    net = tflearn.fully_connected(net, num_classes, activation='softmax')
+    net = tflearn.fully_connected(net, num_classes, activation='relu')
     net = tflearn.regression(net, optimizer='adam', learning_rate=0.0005,
-                             loss='categorical_crossentropy', name='output1')
+                             loss='mean_squared_error', name='output1')
     return net
 
 
 if __name__ == '__main__':
 
     data = DataSet(width=160, height=90)
-    # data.load()
-    # data.dump_cache()
+    data.load()
+    data.dump_cache()
     data.load_cache()
     # data.to_sequence_trunks()
-    _net = get_network_wide(50, data.height, data.width, data.class_number)
+    _net = get_network_wide(50, data.height, data.width)
     model = tflearn.DNN(_net, tensorboard_verbose=0)
 
     # model.save('data/checkpoints/lstm.128.160.90.tflearn')
@@ -51,4 +51,4 @@ if __name__ == '__main__':
 
             labels = model.predict_label(x[:100])
             print([x[0] for x in labels])
-            print(list(np.argmax(y[:100], axis=1)))
+            print(y[:100])
