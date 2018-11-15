@@ -3,4 +3,4 @@ venv
 *.pyc
 
 data
-!data/data.json
+!data/videos.json
