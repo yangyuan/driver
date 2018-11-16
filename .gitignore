@@ -4,3 +4,5 @@ venv
 
 data
 !data/videos.json
+
+node_modules

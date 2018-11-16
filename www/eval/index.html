@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"> </script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter"></script>
+    <script type="text/javascript">
+        const MODEL_URL = '../../data/web_model/tensorflowjs_model.pb';
+        const WEIGHTS_URL = '../../data/web_model/weights_manifest.json';
+
+        var predictor = null
+
+      const model = tf.loadFrozenModel(MODEL_URL, WEIGHTS_URL).then(
+          function(result) {
+            predictor = result;
+            console.log(predictor)
+            xxx = tf.randomNormal([1, 50, 90, 160, 1]);
+              predictor.executeAsync({"InputData/X": xxx}).then(
+                  function(result2) {
+                    result2.print();
+
+                    console.log(result2.toFloat())
+                });
+        });
+
+      console.log("model loaded");
+
+    var pool = []
+
+    setInterval(function () {
+    let vid = document.getElementById('player');
+        if (vid.readyState === 4 && vid.paused === false) {
+          let canvas = document.getElementById("c");
+           ctx = canvas.getContext('2d');
+           data = ctx.getImageData(0,0,160,90)
+
+           _tmp = []
+
+           for (let i =0; i< 160*90; i++) {
+              _tmp.push(data.data[i*4]);
+           }
+
+           one = tf.tensor(_tmp).reshape([1, 90, 160, 1]).toFloat()
+           pool.push(one)
+           if (pool.length > 50) {
+                pool.shift();
+            if (predictor != null) {
+              var xxxx = tf.concat(pool)
+              xxxx = xxxx.reshape([1,50,90,160,1])
+
+                var model = tf.loadFrozenModel(MODEL_URL, WEIGHTS_URL).then(
+          function(result) {
+            predictor = result;
+            //console.log(predictor)
+              predictor.executeAsync({"InputData/X": xxxx}).then(
+                  function(result2) {
+                    result2.print();
+
+                    //console.log(result2.toFloat())
+                });
+        });
+        }
+        }
+
+           //console.log(pool.length);
+           //console.log(predictor);
+        }
+    }, 200);
+
+    </script>
+  </head>
+  <body>
+<video id="player" width="555" height="312" style="margin: auto;" controls>
+                    <source src="../../data/ip5s/IMG_0178.mov" type=video/mp4>
+                </video>
+
+
+  <canvas id=c></canvas>
+  </body>
+    <script>
+
+      document.addEventListener('DOMContentLoaded', function(){
+    var v = document.getElementById('player');
+    var canvas = document.getElementById('c');
+    var context = canvas.getContext('2d');
+    var back = document.createElement('canvas');
+    var backcontext = back.getContext('2d');
+
+    context.scale(1.5, 1.5);
+    var cw,ch;
+
+    v.addEventListener('play', function(){
+        cw = v.clientWidth;
+        ch = v.clientHeight;
+        canvas.width = 160;
+        canvas.height = 90;
+        back.width = cw;
+        back.height = ch;
+        draw(v,context,backcontext,cw,ch);
+    },false);
+
+},false);
+
+function draw(v,c,bc,w,h) {
+    if(v.paused || v.ended) return false;
+    // First, draw it into the backing canvas
+    bc.drawImage(v,0,0,160,90);
+    // Grab the pixel data from the backing canvas
+    var idata = bc.getImageData(0,0,w,h);
+    var data = idata.data;
+    // Loop through the pixels, turning them grayscale
+    for(var i = 0; i < data.length; i+=4) {
+        var r = data[i];
+        var g = data[i+1];
+        var b = data[i+2];
+        var brightness = (3*r+4*g+b)>>>3;
+        data[i] = brightness;
+        data[i+1] = brightness;
+        data[i+2] = brightness;
+    }
+    idata.data = data;
+    // Draw the pixels onto the visible canvas
+    c.putImageData(idata,0,0);
+
+    // Start over!
+    setTimeout(function(){ draw(v,c,bc,w,h); }, 0);
+}
+    </script>
+</html>

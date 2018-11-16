@@ -91,9 +91,10 @@ class DataSet:
                 frame = np.array(frame, np.float).ravel()
             # Add to the queue.
             if len(temp_x) == self.trunk_size - 1:
+                frame = frame/255
                 temp_x.append(frame)
                 x.append(np.array(list(temp_x)))
-                temp_y = [action]
+                temp_y = [math.pow(action/5, 0.8)]
                 y.append(temp_y)
                 temp_x.popleft()
             else:
@@ -106,7 +107,7 @@ class DataSet:
             print(self._to_sequence_trunks(frames, actions))
 
     def to_sequence_frames(self, batch_size=1):
-        for frames, actions in self.data:
+        for frames, actions in reversed(self.data):
             for frame, action in zip(frames, actions):
                 frame = np.array(frame, np.float).reshape(320, 180, 1)
                 label = [action]

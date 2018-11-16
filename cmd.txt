@@ -1,0 +1,1 @@
+tensorflowjs_converter --input_format=tf_saved_model --output_node_names=FullyConnected_1/Relu --saved_model_tags=serve data/saved_model data/web_model
